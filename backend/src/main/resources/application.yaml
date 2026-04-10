@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: planplus
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/planplus_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:default_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Hibernate će sam napraviti tabele na osnovu Java klasa
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080

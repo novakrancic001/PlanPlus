@@ -6,18 +6,15 @@
     <h3>Dodaj novi proizvod</h3>
 
     <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-
       <div class="form-row">
         <div class="form-group">
           <label>SKU</label>
           <input type="text" formControlName="sku" placeholder="npr. BIC-001" />
         </div>
-
         <div class="form-group">
           <label>Naziv</label>
           <input type="text" formControlName="name" placeholder="npr. Bicikl" />
         </div>
-
         <div class="form-group">
           <label>Jedinica mere</label>
           <select formControlName="unit">
@@ -27,21 +24,15 @@
             <option value="L">L - litar</option>
           </select>
         </div>
-
         <div class="form-group">
           <label>Opis</label>
           <input type="text" formControlName="description" placeholder="Opciono" />
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
-      <button type="submit" [disabled]="productForm.invalid">
-        Dodaj proizvod
-      </button>
-
+      <button type="submit" [disabled]="productForm.invalid">Dodaj proizvod</button>
     </form>
   </div>
 
@@ -60,21 +51,50 @@
       </thead>
       <tbody>
         <tr *ngFor="let product of products">
-          <td>{{ product.sku }}</td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.description || '-' }}</td>
-          <td>{{ product.unit }}</td>
-          <td>
-            <a [routerLink]="['/products', product.id]" class="btn-detail">
-              Detalji
-            </a>
-          </td>
+
+          <!-- Edit mode -->
+          <ng-container *ngIf="editingId === product.id; else viewMode">
+            <td>{{ product.sku }}</td>
+            <td>
+              <input class="inline-input" [(ngModel)]="editName" />
+            </td>
+            <td>
+              <input class="inline-input" [(ngModel)]="editDescription" placeholder="Opciono" />
+            </td>
+            <td>{{ product.unit }}</td>
+            <td class="action-cell">
+              <button class="btn-save" (click)="saveEdit(product)">Sačuvaj</button>
+              <button class="btn-cancel" (click)="cancelEdit()">Odustani</button>
+            </td>
+          </ng-container>
+
+          <!-- View mode -->
+          <ng-template #viewMode>
+            <td>{{ product.sku }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description || '-' }}</td>
+            <td>{{ product.unit }}</td>
+            <td class="action-cell">
+              <a [routerLink]="['/products', product.id]" class="btn-detail">Detalji</a>
+              <button class="btn-edit" (click)="startEdit(product)">Izmeni</button>
+              <button class="btn-delete" (click)="openDeleteDialog(product)">Obriši</button>
+            </td>
+          </ng-template>
+
         </tr>
         <tr *ngIf="products.length === 0">
-          <td colspan="4">Nema proizvoda u bazi.</td>
+          <td colspan="5">Nema proizvoda u bazi.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-confirm-dialog
+  *ngIf="showDeleteDialog"
+  title="Brisanje proizvoda"
+  [message]="'Da li želiš da obrišeš proizvod ' + productToDelete?.name + '? Biće obrisane i sve BOM stavke.'"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()">
+</app-confirm-dialog>

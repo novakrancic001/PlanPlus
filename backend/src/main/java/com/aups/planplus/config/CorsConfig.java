@@ -16,7 +16,7 @@ public class CorsConfig {
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/api/**") // Primenjuje se na apsolutno sve rute
                         .allowedOrigins("http://localhost:4200") // Tvoj Angular port
-                        .allowedMethods("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS") // Dozvoljeni HTTP metodi
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Dozvoljeni HTTP metodi
                         .allowedHeaders("*") // Dozvoli sva zaglavlja (bitno za autentifikaciju kasnije)
                         .allowCredentials(true); // Bitno ako budeš slao kolačiće/sessije
             }

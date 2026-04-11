@@ -26,4 +26,19 @@ public class MaterialService {
 
         return materialRepository.save(material);
     }
+
+    public Material updateMaterial(Long id, Material updatedMaterial) {
+        Material existing = materialRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Material not found: " + id));
+        existing.setName(updatedMaterial.getName());
+        existing.setUnit(updatedMaterial.getUnit());
+        return materialRepository.save(existing);
+    }
+
+    public void deleteMaterial(Long id) {
+        if (!materialRepository.existsById(id)) {
+            throw new RuntimeException("Material not found: " + id);
+        }
+        materialRepository.deleteById(id);
+    }
 }

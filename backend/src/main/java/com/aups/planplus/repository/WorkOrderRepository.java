@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
     List<WorkOrder> findByProductId(Long productId);
+
+    boolean existsByProductIdAndStatusIn(Long productId, List<WorkOrder.OrderStatus> statuses);
 }

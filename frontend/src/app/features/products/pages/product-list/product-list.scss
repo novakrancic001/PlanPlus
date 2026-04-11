@@ -74,17 +74,6 @@ button[type="submit"] {
   }
 }
 
-.btn-detail {
-  color: #3b82f6;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .error-message {
   margin-top: 12px;
   color: #ef4444;
@@ -112,5 +101,91 @@ table {
 
   tr:last-child td {
     border-bottom: none;
+  }
+}
+
+// Inline edit input
+.inline-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+// Akcijski deo — dugmad u redu
+.action-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-detail {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn-edit {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: white;
+  color: #475569;
+  cursor: pointer;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.btn-save {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 5px;
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    background: #16a34a;
+  }
+}
+
+.btn-cancel {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: white;
+  color: #475569;
+  cursor: pointer;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.btn-delete {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 5px;
+  background: #fee2e2;
+  color: #ef4444;
+  cursor: pointer;
+
+  &:hover {
+    background: #fecaca;
   }
 }

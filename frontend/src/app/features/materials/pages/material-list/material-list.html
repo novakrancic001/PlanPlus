@@ -6,18 +6,15 @@
     <h3>Dodaj novi materijal</h3>
 
     <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
-
       <div class="form-row">
         <div class="form-group">
           <label>SKU</label>
           <input type="text" formControlName="sku" placeholder="npr. CEL-001" />
         </div>
-
         <div class="form-group">
           <label>Naziv</label>
           <input type="text" formControlName="name" placeholder="npr. Čelik" />
         </div>
-
         <div class="form-group">
           <label>Jedinica mere</label>
           <select formControlName="unit">
@@ -29,14 +26,9 @@
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
-      <button type="submit" [disabled]="materialForm.invalid">
-        Dodaj materijal
-      </button>
-
+      <button type="submit" [disabled]="materialForm.invalid">Dodaj materijal</button>
     </form>
   </div>
 
@@ -49,19 +41,57 @@
           <th>SKU</th>
           <th>Naziv</th>
           <th>Jedinica</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let material of materials">
-          <td>{{ material.sku }}</td>
-          <td>{{ material.name }}</td>
-          <td>{{ material.unit }}</td>
+
+          <!-- Edit mode -->
+          <ng-container *ngIf="editingId === material.id; else viewMode">
+            <td>{{ material.sku }}</td>
+            <td>
+              <input class="inline-input" [(ngModel)]="editName" />
+            </td>
+            <td>
+              <select class="inline-input" [(ngModel)]="editUnit">
+                <option value="PCS">PCS - komad</option>
+                <option value="KG">KG - kilogram</option>
+                <option value="M">M - metar</option>
+                <option value="L">L - litar</option>
+              </select>
+            </td>
+            <td class="action-cell">
+              <button class="btn-save" (click)="saveEdit(material)">Sačuvaj</button>
+              <button class="btn-cancel" (click)="cancelEdit()">Odustani</button>
+            </td>
+          </ng-container>
+
+          <!-- View mode -->
+          <ng-template #viewMode>
+            <td>{{ material.sku }}</td>
+            <td>{{ material.name }}</td>
+            <td>{{ material.unit }}</td>
+            <td class="action-cell">
+              <button class="btn-edit" (click)="startEdit(material)">Izmeni</button>
+              <button class="btn-delete" (click)="openDeleteDialog(material)">Obriši</button>
+            </td>
+          </ng-template>
+
         </tr>
         <tr *ngIf="materials.length === 0">
-          <td colspan="3">Nema materijala u bazi.</td>
+          <td colspan="4">Nema materijala u bazi.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-confirm-dialog
+  *ngIf="showDeleteDialog"
+  title="Brisanje materijala"
+  [message]="'Da li želiš da obrišeš materijal ' + materialToDelete?.name + '?'"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()">
+</app-confirm-dialog>

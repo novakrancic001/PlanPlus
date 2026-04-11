@@ -1,6 +1,7 @@
 package com.aups.planplus.controller;
 
 import com.aups.planplus.model.Product;
+import com.aups.planplus.repository.ProductRepository;
 import com.aups.planplus.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +14,17 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
 
     // GET zahtev na http://localhost:8080/api/products
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable Long id){
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Proizvod nije pronađen"));
     }
 
     // POST zahtev na http://localhost:8080/api/products

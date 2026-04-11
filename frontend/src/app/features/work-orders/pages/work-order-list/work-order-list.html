@@ -47,6 +47,7 @@
           <th>Količina</th>
           <th>Status</th>
           <th>Kreirano</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -60,6 +61,14 @@
             </span>
           </td>
           <td>{{ order.createdAt | date:'dd.MM.yyyy HH:mm' }}</td>
+          <td>
+            <button 
+            *ngIf="nextStatus(order.status)"
+            class="btn-status"
+            (click)="updateStatus(order, nextStatus(order.status)!)">
+            {{ nextStatusLabel(nextStatus(order.status)!) }}
+          </button>
+          </td>
         </tr>
         <tr *ngIf="workOrders.length === 0">
           <td colspan="5">Nema radnih naloga.</td>

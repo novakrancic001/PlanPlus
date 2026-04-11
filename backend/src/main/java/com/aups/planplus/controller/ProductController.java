@@ -24,7 +24,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id){
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Proizvod nije pronađen"));
+        return productService.getById(id);
     }
 
     // POST zahtev na http://localhost:8080/api/products

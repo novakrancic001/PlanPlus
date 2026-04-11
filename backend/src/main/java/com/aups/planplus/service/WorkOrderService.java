@@ -59,4 +59,9 @@ public class WorkOrderService {
 
         return workOrderRepository.save(order);
     }
+
+    public WorkOrder updateStatus(Long id, WorkOrder.OrderStatus status){
+        WorkOrder order = workOrderRepository.findById(id).orElseThrow(() -> new RuntimeException("Radni nalog nije pronađen!"));
+        order.setStatus(status);
+        return workOrderRepository.save(order);}
 }

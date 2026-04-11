@@ -93,4 +93,27 @@ export class WorkOrderList implements OnInit {
     };
     return classes[status] ?? '';
   }
+
+  updateStatus(order: WorkOrder, status: string): void {
+    this.workOrderService.updateStatus(order.id, status).subscribe({
+      next: () => this.loadWorkOrders(),
+      error: (err) => this.errorMessage = err.error?.error || 'Greška pri izmeni statusa.'
+    });
+  }
+
+nextStatus(status: string): string | null {
+    const flow: Record<string, string> = {
+      PLANNED: 'IN_PROGRESS',
+      IN_PROGRESS: 'COMPLETED'
+    };
+    return flow[status] ?? null;
+  }
+
+nextStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      IN_PROGRESS: 'Pokreni',
+      COMPLETED: 'Završi'
+    };
+    return labels[status] ?? '';
+  }
 }

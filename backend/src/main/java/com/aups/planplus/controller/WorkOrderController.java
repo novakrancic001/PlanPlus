@@ -27,4 +27,9 @@ public class WorkOrderController {
     public List<WorkOrder> getAllWorkOrders(){
         return workOrderRepository.findAll();
     }
+
+    @PatchMapping("/{id}/status")
+    public WorkOrder updateStatus(@PathVariable Long id, @RequestParam WorkOrder.OrderStatus status){
+        return workOrderService.updateStatus(id, status);
+    }
 }

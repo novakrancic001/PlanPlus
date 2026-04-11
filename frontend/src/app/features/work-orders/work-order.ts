@@ -22,4 +22,8 @@ export class WorkOrderService {
   create(request: WorkOrderRequest): Observable<WorkOrder> {
     return this.http.post<WorkOrder>(this.apiUrl, request);
   }
+
+  updateStatus(id: number, status: string): Observable<WorkOrder> {
+    return this.http.patch<WorkOrder>(`${this.apiUrl}/${id}/status`, null, {params: { status }});
+  }
 }

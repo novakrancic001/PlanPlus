@@ -18,6 +18,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public Product getById(Long id){
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Proizvod sa ID " + id + " nije pronađen!"));
+    }
+
     // 2. Kreiraj novi proizvod (CREATE) sa biznis logikom
     public Product createProduct(Product product) {
         // Biznis logika: Ako proizvod sa ovim SKU već postoji, ne dozvoli upis!

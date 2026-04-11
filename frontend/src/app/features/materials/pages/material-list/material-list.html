@@ -1,0 +1,67 @@
+<div class="page">
+
+  <h2 class="page-title">Materijali</h2>
+
+  <div class="card form-card">
+    <h3>Dodaj novi materijal</h3>
+
+    <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>SKU</label>
+          <input type="text" formControlName="sku" placeholder="npr. CEL-001" />
+        </div>
+
+        <div class="form-group">
+          <label>Naziv</label>
+          <input type="text" formControlName="name" placeholder="npr. Čelik" />
+        </div>
+
+        <div class="form-group">
+          <label>Jedinica mere</label>
+          <select formControlName="unit">
+            <option value="PCS">PCS - komad</option>
+            <option value="KG">KG - kilogram</option>
+            <option value="M">M - metar</option>
+            <option value="L">L - litar</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="materialForm.invalid">
+        Dodaj materijal
+      </button>
+
+    </form>
+  </div>
+
+  <div class="card">
+    <div *ngIf="isLoading">Ucitavanje...</div>
+
+    <table *ngIf="!isLoading">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Naziv</th>
+          <th>Jedinica</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let material of materials">
+          <td>{{ material.sku }}</td>
+          <td>{{ material.name }}</td>
+          <td>{{ material.unit }}</td>
+        </tr>
+        <tr *ngIf="materials.length === 0">
+          <td colspan="3">Nema materijala u bazi.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

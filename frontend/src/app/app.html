@@ -1,0 +1,36 @@
+<div class="app-shell">
+
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h1>PlanPlus</h1>
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/work-orders" routerLinkActive="active">
+          Radni nalozi
+        </a>
+      </li>
+      <li>
+        <a routerLink="/products" routerLinkActive="active">
+          Proizvodi
+        </a>
+      </li>
+      <li>
+        <a routerLink="/materials" routerLinkActive="active">
+          Materijali
+        </a>
+      </li>
+      <li>
+        <a routerLink="/inventory" routerLinkActive="active">
+          Zalihe
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+
+</div>

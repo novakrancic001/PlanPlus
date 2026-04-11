@@ -1,0 +1,65 @@
+<div class="page">
+
+  <h2 class="page-title">Zalihe</h2>
+
+  <div class="card form-card">
+    <h3>Dodaj zalihe</h3>
+
+    <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+
+        <div class="form-group">
+          <label>Materijal</label>
+          <select formControlName="materialId">
+            <option [value]="null" disabled>Izaberi materijal</option>
+            <option *ngFor="let m of materials" [value]="m.id">
+              {{ m.name }} ({{ m.sku }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Količina</label>
+          <input type="number" formControlName="quantity" placeholder="npr. 100" min="0.01" step="0.01" />
+        </div>
+
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="stockForm.invalid">
+        Dodaj na zalihe
+      </button>
+
+    </form>
+  </div>
+
+  <div class="card">
+    <div *ngIf="isLoading">Ucitavanje...</div>
+
+    <table *ngIf="!isLoading">
+      <thead>
+        <tr>
+          <th>Materijal</th>
+          <th>SKU</th>
+          <th>Jedinica</th>
+          <th>Trenutno stanje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of inventory">
+          <td>{{ item.material.name }}</td>
+          <td>{{ item.material.sku }}</td>
+          <td>{{ item.material.unit }}</td>
+          <td>{{ item.currentStock }}</td>
+        </tr>
+        <tr *ngIf="inventory.length === 0">
+          <td colspan="4">Nema materijala na zalihama.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

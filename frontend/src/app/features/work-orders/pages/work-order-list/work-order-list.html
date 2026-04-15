@@ -52,7 +52,7 @@
           <th>Količina</th>
           <th>Status</th>
           <th>Kreiran</th>
-          <th>Akcija</th>
+          <th>Akcije</th>
         </tr>
       </thead>
       <tbody>
@@ -67,7 +67,14 @@
             </span>
           </td>
           <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
-          <td>
+          <td class="actions">
+            <button
+              *ngIf="canAdvance(order)"
+              class="btn-advance"
+              (click)="advanceOrder(order.id)"
+            >
+              {{ advanceLabels[order.status] }}
+            </button>
             <button
               *ngIf="canCancel(order)"
               class="btn-cancel"
@@ -75,7 +82,7 @@
             >
               Otkaži
             </button>
-            <span *ngIf="!canCancel(order)" class="no-action">—</span>
+            <span *ngIf="!canAdvance(order) && !canCancel(order)" class="no-action">—</span>
           </td>
         </tr>
         <tr *ngIf="workOrders.length === 0">

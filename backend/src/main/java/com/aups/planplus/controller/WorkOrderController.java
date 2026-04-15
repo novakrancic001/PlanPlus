@@ -25,6 +25,11 @@ public class WorkOrderController {
         return workOrderService.createWorkOrder(request);
     }
 
+    @PatchMapping("/{id}/advance")
+    public WorkOrder advanceStatus(@PathVariable Long id){
+        return workOrderService.advanceStatus(id);
+    }
+
     @PatchMapping("/{id}/cancel")
     public WorkOrder cancelWorkOrder(@PathVariable Long id) {
         return workOrderService.cancelWorkOrder(id);

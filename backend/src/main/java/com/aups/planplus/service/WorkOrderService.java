@@ -9,6 +9,7 @@ import com.aups.planplus.repository.ProductRepository;
 import com.aups.planplus.repository.WorkOrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -57,6 +58,21 @@ public class WorkOrderService {
         order.setQuantity(request.getQuantity());
         order.setStatus(WorkOrder.OrderStatus.PLANNED);
         order.setCreatedAt(LocalDateTime.now());
+
+        return workOrderRepository.save(order);
+    }
+
+    @Transactional
+    public WorkOrder advanceStatus(Long id) {
+        WorkOrder order = workOrderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Radni nalog nije pronađen!"));
+
+        switch (order.getStatus()) {
+            case PLANNED     -> order.setStatus(WorkOrder.OrderStatus.IN_PROGRESS);
+            case IN_PROGRESS -> order.setStatus(WorkOrder.OrderStatus.COMPLETED);
+            default          -> throw new RuntimeException(
+                    "Nije moguće napredovati nalog sa statusom: " + order.getStatus());
+        }
 
         return workOrderRepository.save(order);
     }

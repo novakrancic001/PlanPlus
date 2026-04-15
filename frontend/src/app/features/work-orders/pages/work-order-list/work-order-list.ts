@@ -28,6 +28,11 @@ export class WorkOrderList implements OnInit {
     CANCELLED: 'Otkazan',
   };
 
+  readonly advanceLabels: Partial<Record<OrderStatus, string>> = {
+    PLANNED: 'Pokreni',
+    IN_PROGRESS: 'Završi',
+  };
+
   constructor(
     private workOrderService: WorkOrderService,
     private productService: ProductService,
@@ -83,8 +88,23 @@ export class WorkOrderList implements OnInit {
     });
   }
 
+  advanceOrder(id: number): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.workOrderService.advance(id).subscribe({
+      next: () => {
+        this.successMessage = 'Status naloga je ažuriran.';
+        this.loadWorkOrders();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Greška pri ažuriranju statusa.';
+      },
+    });
+  }
+
   cancelOrder(id: number): void {
-    if (!confirm('Otkazati ovaj radni nalog?')) return;
+    if (!confirm('Otkazati ovaj radni nalog? Materijali će biti vraćeni na zalihe.')) return;
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -97,6 +117,10 @@ export class WorkOrderList implements OnInit {
         this.errorMessage = err.error?.error || 'Greška pri otkazivanju naloga.';
       },
     });
+  }
+
+  canAdvance(order: WorkOrder): boolean {
+    return order.status === 'PLANNED' || order.status === 'IN_PROGRESS';
   }
 
   canCancel(order: WorkOrder): boolean {

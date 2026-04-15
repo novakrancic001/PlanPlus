@@ -3,7 +3,7 @@
   <h2 class="page-title">Radni nalozi</h2>
 
   <div class="card form-card">
-    <h3>Kreiraj novi nalog</h3>
+    <h3>Kreiraj novi radni nalog</h3>
 
     <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
       <div class="form-row">
@@ -20,58 +20,66 @@
 
         <div class="form-group">
           <label>Količina</label>
-          <input type="number" formControlName="quantity" placeholder="npr. 10" min="0.01" step="0.01" />
+          <input
+            type="number"
+            formControlName="quantity"
+            placeholder="npr. 10"
+            min="0.01"
+            step="0.01"
+          />
         </div>
 
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
 
       <button type="submit" [disabled]="orderForm.invalid">
         Kreiraj nalog
       </button>
-
     </form>
   </div>
 
   <div class="card">
-    <div *ngIf="isLoading">Ucitavanje...</div>
+    <div *ngIf="isLoading">Učitavanje...</div>
 
     <table *ngIf="!isLoading">
       <thead>
         <tr>
+          <th>#</th>
           <th>Proizvod</th>
           <th>SKU</th>
           <th>Količina</th>
           <th>Status</th>
-          <th>Kreirano</th>
-          <th></th>
+          <th>Kreiran</th>
+          <th>Akcija</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let order of workOrders">
+          <td>{{ order.id }}</td>
           <td>{{ order.product.name }}</td>
           <td>{{ order.product.sku }}</td>
-          <td>{{ order.quantity }}</td>
+          <td>{{ order.quantity }} {{ order.product.unit }}</td>
           <td>
-            <span [class]="'status-badge ' + statusClass(order.status)">
-              {{ statusLabel(order.status) }}
+            <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
+              {{ statusLabels[order.status] }}
             </span>
           </td>
-          <td>{{ order.createdAt | date:'dd.MM.yyyy HH:mm' }}</td>
+          <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
           <td>
-            <button 
-            *ngIf="nextStatus(order.status)"
-            class="btn-status"
-            (click)="updateStatus(order, nextStatus(order.status)!)">
-            {{ nextStatusLabel(nextStatus(order.status)!) }}
-          </button>
+            <button
+              *ngIf="canCancel(order)"
+              class="btn-cancel"
+              (click)="cancelOrder(order.id)"
+            >
+              Otkaži
+            </button>
+            <span *ngIf="!canCancel(order)" class="no-action">—</span>
           </td>
         </tr>
         <tr *ngIf="workOrders.length === 0">
-          <td colspan="5">Nema radnih naloga.</td>
+          <td colspan="7">Nema radnih naloga.</td>
         </tr>
       </tbody>
     </table>

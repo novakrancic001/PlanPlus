@@ -23,34 +23,35 @@ public class WorkOrderService {
     private final BOMItemRepository bomItemRepository;
     private final InventoryService inventoryService;
 
-    @Transactional
-    public WorkOrder createWorkOrder(WorkOrderRequest request){
-        // 1. Pronadji proizvod
-        Product product = productRepository.findById(request.getProductId()).orElseThrow(() -> new RuntimeException("Proizvod nije pronađen!"));
+    public List<WorkOrder> getAllWorkOrders() {
+        return workOrderRepository.findAll();
+    }
 
-        // 2. Pronadji sastavnicu za taj proizvod
+    @Transactional
+    public WorkOrder createWorkOrder(WorkOrderRequest request) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RuntimeException("Proizvod nije pronađen!"));
+
         List<BOMItem> bomItems = bomItemRepository.findByProductId(product.getId());
         if (bomItems.isEmpty()) {
             throw new RuntimeException("Proizvod nema definisanu sastavnicu!");
-
         }
 
-        // 3. Provera zaliha
-        for (BOMItem item : bomItems){
+        for (BOMItem item : bomItems) {
             Double neededTotal = item.getQuantityRequired() * request.getQuantity();
             Double available = inventoryService.getStockForMaterial(item.getMaterial().getId());
-
-            if (available < neededTotal){
-                throw new RuntimeException("Nedovoljno zaliha za materijal: " + item.getMaterial().getName() + ". Potrebno: " + neededTotal + ", Dostupno: " + available);
+            if (available < neededTotal) {
+                throw new RuntimeException(
+                        "Nedovoljno zaliha za materijal: " + item.getMaterial().getName() +
+                                ". Potrebno: " + neededTotal + ", Dostupno: " + available);
             }
         }
 
-        for (BOMItem item : bomItems){
+        for (BOMItem item : bomItems) {
             Double neededTotal = item.getQuantityRequired() * request.getQuantity();
             inventoryService.reduceStock(item.getMaterial().getId(), neededTotal);
         }
 
-        // 4. Ako je sve OK, kreiraj nalog
         WorkOrder order = new WorkOrder();
         order.setProduct(product);
         order.setQuantity(request.getQuantity());
@@ -60,8 +61,25 @@ public class WorkOrderService {
         return workOrderRepository.save(order);
     }
 
-    public WorkOrder updateStatus(Long id, WorkOrder.OrderStatus status){
-        WorkOrder order = workOrderRepository.findById(id).orElseThrow(() -> new RuntimeException("Radni nalog nije pronađen!"));
-        order.setStatus(status);
-        return workOrderRepository.save(order);}
+    @Transactional
+    public WorkOrder cancelWorkOrder(Long id) {
+        WorkOrder order = workOrderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Radni nalog nije pronađen!"));
+
+        if (order.getStatus() == WorkOrder.OrderStatus.COMPLETED ||
+                order.getStatus() == WorkOrder.OrderStatus.CANCELLED) {
+            throw new RuntimeException(
+                    "Nije moguće otkazati nalog sa statusom: " + order.getStatus());
+        }
+
+        // Vraćamo materijale na zalihe
+        List<BOMItem> bomItems = bomItemRepository.findByProductId(order.getProduct().getId());
+        for (BOMItem item : bomItems) {
+            Double returnAmount = item.getQuantityRequired() * order.getQuantity();
+            inventoryService.addStock(item.getMaterial().getId(), returnAmount);
+        }
+
+        order.setStatus(WorkOrder.OrderStatus.CANCELLED);
+        return workOrderRepository.save(order);
+    }
 }

@@ -33,7 +33,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 180px;
+  min-width: 200px;
 
   label {
     font-size: 0.85rem;
@@ -41,7 +41,8 @@
     color: #64748b;
   }
 
-  input, select {
+  input,
+  select {
     padding: 8px 12px;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
@@ -54,7 +55,7 @@
   }
 }
 
-button[type="submit"] {
+button[type='submit'] {
   margin-top: 16px;
   padding: 10px 24px;
   background-color: #3b82f6;
@@ -77,6 +78,12 @@ button[type="submit"] {
 .error-message {
   margin-top: 12px;
   color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.success-message {
+  margin-top: 12px;
+  color: #22c55e;
   font-size: 0.9rem;
 }
 
@@ -104,19 +111,21 @@ table {
   }
 }
 
+// Status bedževi
 .status-badge {
-  padding: 4px 10px;
-  border-radius: 99px;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .status-planned {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: #dbeafe;
+  color: #1d4ed8;
 }
 
-.status-progress {
+.status-in_progress {
   background-color: #fef9c3;
   color: #854d0e;
 }
@@ -131,17 +140,20 @@ table {
   color: #991b1b;
 }
 
-.btn-status {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  background-color: #3b82f6;
+.btn-cancel {
+  padding: 5px 12px;
+  background-color: #ef4444;
   color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  cursor: pointer;
 
   &:hover {
-    background-color: #2563eb;
+    background-color: #dc2626;
   }
+}
+
+.no-action {
+  color: #94a3b8;
 }

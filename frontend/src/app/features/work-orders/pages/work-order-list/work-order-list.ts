@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { WorkOrder } from '../../../../core/models/work-order.model';
+import { WorkOrder, OrderStatus } from '../../../../core/models/work-order.model';
 import { WorkOrderService } from '../../work-order';
 import { ProductService } from '../../../products/product';
 import { Product } from '../../../../core/models/product.model';
@@ -10,25 +10,32 @@ import { Product } from '../../../../core/models/product.model';
   selector: 'app-work-order-list',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './work-order-list.html',
-  styleUrl: './work-order-list.scss'
+  styleUrl: './work-order-list.scss',
 })
 export class WorkOrderList implements OnInit {
-
   workOrders: WorkOrder[] = [];
   products: Product[] = [];
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
 
   orderForm: FormGroup;
+
+  readonly statusLabels: Record<OrderStatus, string> = {
+    PLANNED: 'Planiran',
+    IN_PROGRESS: 'U toku',
+    COMPLETED: 'Završen',
+    CANCELLED: 'Otkazan',
+  };
 
   constructor(
     private workOrderService: WorkOrderService,
     private productService: ProductService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.orderForm = this.fb.group({
       productId: [null, Validators.required],
-      quantity: [null, [Validators.required, Validators.min(0.01)]]
+      quantity: [null, [Validators.required, Validators.min(0.01)]],
     });
   }
 
@@ -48,72 +55,51 @@ export class WorkOrderList implements OnInit {
         this.errorMessage = 'Greška pri učitavanju radnih naloga.';
         this.isLoading = false;
         console.error(err);
-      }
+      },
     });
   }
 
   loadProducts(): void {
     this.productService.getAll().subscribe({
-      next: (data) => this.products = data,
-      error: (err) => console.error(err)
+      next: (data) => (this.products = data),
+      error: (err) => console.error(err),
     });
   }
 
   onSubmit(): void {
     if (this.orderForm.invalid) return;
+    this.errorMessage = '';
+    this.successMessage = '';
 
     this.workOrderService.create(this.orderForm.value).subscribe({
       next: () => {
         this.orderForm.reset();
-        this.errorMessage = '';
+        this.successMessage = 'Radni nalog je uspešno kreiran.';
         this.loadWorkOrders();
       },
       error: (err) => {
         this.errorMessage = err.error?.error || 'Greška pri kreiranju radnog naloga.';
-      }
+      },
     });
   }
 
-  statusLabel(status: string): string {
-    const labels: Record<string, string> = {
-      PLANNED: 'Planiran',
-      IN_PROGRESS: 'U toku',
-      COMPLETED: 'Završen',
-      CANCELLED: 'Otkazan'
-    };
-    return labels[status] ?? status;
-  }
+  cancelOrder(id: number): void {
+    if (!confirm('Otkazati ovaj radni nalog?')) return;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-  statusClass(status: string): string {
-    const classes: Record<string, string> = {
-      PLANNED: 'status-planned',
-      IN_PROGRESS: 'status-progress',
-      COMPLETED: 'status-completed',
-      CANCELLED: 'status-cancelled'
-    };
-    return classes[status] ?? '';
-  }
-
-  updateStatus(order: WorkOrder, status: string): void {
-    this.workOrderService.updateStatus(order.id, status).subscribe({
-      next: () => this.loadWorkOrders(),
-      error: (err) => this.errorMessage = err.error?.error || 'Greška pri izmeni statusa.'
+    this.workOrderService.cancel(id).subscribe({
+      next: () => {
+        this.successMessage = 'Radni nalog je otkazan.';
+        this.loadWorkOrders();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Greška pri otkazivanju naloga.';
+      },
     });
   }
 
-nextStatus(status: string): string | null {
-    const flow: Record<string, string> = {
-      PLANNED: 'IN_PROGRESS',
-      IN_PROGRESS: 'COMPLETED'
-    };
-    return flow[status] ?? null;
-  }
-
-nextStatusLabel(status: string): string {
-    const labels: Record<string, string> = {
-      IN_PROGRESS: 'Pokreni',
-      COMPLETED: 'Završi'
-    };
-    return labels[status] ?? '';
+  canCancel(order: WorkOrder): boolean {
+    return order.status === 'PLANNED' || order.status === 'IN_PROGRESS';
   }
 }

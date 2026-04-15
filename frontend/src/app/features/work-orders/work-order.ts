@@ -23,7 +23,7 @@ export class WorkOrderService {
     return this.http.post<WorkOrder>(this.apiUrl, request);
   }
 
-  updateStatus(id: number, status: string): Observable<WorkOrder> {
-    return this.http.patch<WorkOrder>(`${this.apiUrl}/${id}/status`, null, {params: { status }});
+  cancel(id: number): Observable<WorkOrder> {
+    return this.http.patch<WorkOrder>(`${this.apiUrl}/${id}/cancel`, {});
   }
 }

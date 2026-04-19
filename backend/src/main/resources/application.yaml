@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # Hibernate će sam napraviti tabele na osnovu Java klasa
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -19,3 +19,16 @@ spring:
 
 server:
   port: 8080
+
+# JWT konfiguracija
+jwt:
+  secret: ${JWT_SECRET:CHANGE_ME_IN_LOCAL_YAML_MINIMUM_256_BITS_BASE64}
+  expiration-ms: 86400000  # 24 sata
+
+# Bootstrap admin nalog (kreira se pri prvom pokretanju ako nema korisnika)
+app:
+  admin:
+    username: ${APP_ADMIN_USERNAME:admin}
+    password: ${APP_ADMIN_PASSWORD:admin123}
+    first-name: System
+    last-name: Administrator

@@ -1,7 +1,7 @@
 package com.aups.planplus.model;
 
+import com.aups.planplus.auth.model.User;
 import jakarta.persistence.*;
-import jdk.jfr.Unsigned;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -24,6 +24,10 @@ public class WorkOrder {
     private OrderStatus status;
 
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
+    private User assignedTo;
 
     public enum OrderStatus {
         PLANNED, IN_PROGRESS, COMPLETED, CANCELLED

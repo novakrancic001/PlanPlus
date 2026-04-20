@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/materials")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('PLANNER')")
 public class MaterialController {
 
     private final MaterialService materialService;
@@ -21,7 +23,7 @@ public class MaterialController {
     public List<Material> getAllMaterials() { return materialService.getAllMaterials(); }
 
     @PostMapping
-    public Material createMaterial(@RequestBody Material material){
+    public Material createMaterial(@RequestBody Material material) {
         return materialService.createMaterial(material);
     }
 

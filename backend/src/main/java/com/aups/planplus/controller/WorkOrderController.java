@@ -3,13 +3,16 @@ package com.aups.planplus.controller;
 import com.aups.planplus.dto.AssignRequest;
 import com.aups.planplus.dto.WorkOrderRequest;
 import com.aups.planplus.dto.WorkOrderResponse;
+import com.aups.planplus.model.WorkOrder;
 import com.aups.planplus.service.WorkOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/work-orders")
@@ -20,8 +23,13 @@ public class WorkOrderController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('PLANNER','OPERATOR')")
-    public List<WorkOrderResponse> getAllWorkOrders(Authentication auth) {
-        return workOrderService.getAllWorkOrders(auth);
+    public Page<WorkOrderResponse> getAllWorkOrders(
+            @RequestParam(required = false) WorkOrder.OrderStatus status,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) Long assignedToId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication auth) {
+        return workOrderService.getAllWorkOrders(auth, status, productId, assignedToId, pageable);
     }
 
     @GetMapping("/{id}")

@@ -4,12 +4,14 @@ import com.aups.planplus.model.Material;
 import com.aups.planplus.service.MaterialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/materials")
@@ -20,7 +22,11 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @GetMapping
-    public List<Material> getAllMaterials() { return materialService.getAllMaterials(); }
+    public Page<Material> getAllMaterials(
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return materialService.getAllMaterials(search, pageable);
+    }
 
     @PostMapping
     public Material createMaterial(@RequestBody Material material) {

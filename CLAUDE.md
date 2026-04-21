@@ -19,7 +19,8 @@ Projektni zadatak na predmetu AUPS 2025/2026, Fakultet tehničkih nauka.
 - `com.aups.planplus.controller` — REST kontroleri
 - `com.aups.planplus.dto` — request/response DTO-ovi
 - `com.aups.planplus.config` — Spring konfiguracija (CORS itd.)
-- `com.aups.planplus.auth` — novi paket za autentifikaciju (u izradi)
+- `com.aups.planplus.auth` — autentifikacija i autorizacija (User, Role JWT, SecurityConfig)
+- `com.aups.planplus.workload` — semafor opterećenosti operatera
 
 ## Domenski model
 - **Material** — sirovine sa SKU, imenom, jedinicom mere
@@ -28,7 +29,7 @@ Projektni zadatak na predmetu AUPS 2025/2026, Fakultet tehničkih nauka.
 - **BOMItem** — sastavnica: koliko materijala treba za proizvod
 - **WorkOrder** — radni nalog sa statusima PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
 
-## Uloge (u izradi — Chat 1 auth sistem)
+## Uloge (u izradi — Chat 4)
 - **ADMIN** — jedini može registrovati nove korisnike
 - **PLANNER** — CRUD nad svim domenskim entitetima, dodeljuje radne naloge operaterima
 - **OPERATOR** — vidi samo radne naloge koji su mu dodeljeni
@@ -42,10 +43,10 @@ Projektni zadatak na predmetu AUPS 2025/2026, Fakultet tehničkih nauka.
 - Poruke grešaka u exception handleru → srpski
 
 ## Radni proces — planirani chat-ovi
-1. **Chat 1** (u toku): Backend autentifikacija — Spring Security + JWT, User entitet, login/register endpointi
-2. **Chat 2**: Backend autorizacija — @PreAuthorize po rolama, dodela operatera na WorkOrder, logika opterećenosti
-3. **Chat 3**: Backend paginacija, sortiranje, pretraga — Pageable na svim list endpointima
-4. **Chat 4**: Frontend autentifikacija — Angular login/register/logout, AuthInterceptor, AuthGuard
+1. **Chat 1** (zavrseno): Backend autentifikacija — Spring Security + JWT, User entitet, login/register endpointi
+2. **Chat 2** (zavrseno): Backend autorizacija — @PreAuthorize po rolama, dodela operatera na WorkOrder, logika opterećenosti
+3. **Chat 3** (zavrseno): Backend paginacija, sortiranje, pretraga — Pageable na svim list endpointima
+4. **Chat 4** (na redu): Frontend autentifikacija — Angular login/register/logout, AuthInterceptor, AuthGuard
 5. **Chat 5**: Frontend paginacija i tabele — MatTable, MatPaginator, MatSort
 
 ## Komande koje često koristim
@@ -56,12 +57,18 @@ Projektni zadatak na predmetu AUPS 2025/2026, Fakultet tehničkih nauka.
 - Frontend build: `cd frontend && npm run build`
 
 ## Šta trenutno radim
-Implementiram Chat 1 — backend autentifikaciju. Plan implementacije je dokumentovan
-u chat-u sa Claude-om na claude.ai. Kad nešto nije jasno, prvo pogledaj strukturu
-postojećeg koda, pa tek onda pretpostavljaj.
+Krećem Chat 4 — frontend autentifikaciju u Angular-u.
+Backend auth/autorizacija (Chat 1, 2) i paginacija (Chat 3) su završeni
+i testirani kroz Postman. Sada treba da implementiram login/register
+stranice, AuthInterceptor za JWT, AuthGuard za zaštitu ruta i logout.
+Plan implementacije se vodi u chat-u na claude.ai.
+
+Detaljni rezimei završenih faza: docs/plans/chat{1,2,3}-summary.md
 
 ## Šta Claude NE treba da radi
-- Ne menjaj `frontend/` fajlove dok radimo na Chat 1 (to je za Chat 4)
+- Ne menjaj `backend/` fajlove bez eksplicitne potvrde (backend je završen kroz Chat 1-3)
+- Ne refaktorisi postojeće feature komponente (materials, products, work-orders, inventory, bom) bez dogovora — Chat 4 dodaje auth, ne menja postojeće stranice
+- Ne dodaji nove npm dependencies bez da prvo pitaš (posebno ne Angular Material — o tome smo već razgovarali)
 - Ne refaktorisi postojeće entitete (Material, Product, WorkOrder...) bez eksplicitne potvrde
 - Ne dodaji nove Maven dependencies bez da prvo pitaš
 - Ne menjaj `application.properties` kredencijale za bazu

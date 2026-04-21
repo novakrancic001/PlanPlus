@@ -5,19 +5,24 @@ import com.aups.planplus.model.WorkOrder;
 import com.aups.planplus.repository.ProductRepository;
 import com.aups.planplus.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service // Govori Springu da je ovo klasa sa biznis logikom
-@RequiredArgsConstructor // Automatski ubacuje ProductRepository (Dependency Injection)
+@Service
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     public final WorkOrderRepository workOrderRepository;
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(String search, Pageable pageable) {
+        if (search != null && !search.isBlank()) {
+            return productRepository.findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(search, search, pageable);
+        }
+        return productRepository.findAll(pageable);
     }
 
     public Product getById(Long id){

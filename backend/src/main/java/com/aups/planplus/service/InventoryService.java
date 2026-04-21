@@ -5,6 +5,8 @@ import com.aups.planplus.model.Material;
 import com.aups.planplus.repository.InventoryRepository;
 import com.aups.planplus.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +14,13 @@ import org.springframework.stereotype.Service;
 public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final MaterialRepository materialRepository;
+
+    public Page<Inventory> getAllInventory(String search, Pageable pageable) {
+        if (search != null && !search.isBlank()) {
+            return inventoryRepository.findByMaterialNameContainingIgnoreCaseOrMaterialSkuContainingIgnoreCase(search, search, pageable);
+        }
+        return inventoryRepository.findAll(pageable);
+    }
 
     public Inventory addStock(Long materialId, Double quantity){
         // Proveri da li materijal postoji

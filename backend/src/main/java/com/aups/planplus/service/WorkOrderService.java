@@ -11,8 +11,12 @@ import com.aups.planplus.model.WorkOrder;
 import com.aups.planplus.repository.BOMItemRepository;
 import com.aups.planplus.repository.ProductRepository;
 import com.aups.planplus.repository.WorkOrderRepository;
+import com.aups.planplus.repository.WorkOrderSpec;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -30,15 +34,23 @@ public class WorkOrderService {
     private final InventoryService inventoryService;
     private final UserRepository userRepository;
 
-    public List<WorkOrderResponse> getAllWorkOrders(Authentication auth) {
+    public Page<WorkOrderResponse> getAllWorkOrders(Authentication auth,
+                                                    WorkOrder.OrderStatus status,
+                                                    Long productId,
+                                                    Long assignedToId,
+                                                    Pageable pageable) {
         User currentUser = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen!"));
 
-        List<WorkOrder> orders = currentUser.getRole() == Role.OPERATOR
-                ? workOrderRepository.findByAssignedTo(currentUser)
-                : workOrderRepository.findAll();
+        Specification<WorkOrder> spec = Specification.where(WorkOrderSpec.hasStatus(status))
+                .and(WorkOrderSpec.hasProduct(productId))
+                .and(WorkOrderSpec.hasAssignedTo(assignedToId));
 
-        return orders.stream().map(WorkOrderResponse::from).toList();
+        if (currentUser.getRole() == Role.OPERATOR) {
+            spec = spec.and(WorkOrderSpec.assignedToUser(currentUser));
+        }
+
+        return workOrderRepository.findAll(spec, pageable).map(WorkOrderResponse::from);
     }
 
     public WorkOrderResponse getWorkOrderById(Long id, Authentication auth) {

@@ -45,9 +45,9 @@ public class WorkOrderController {
     }
 
     @PatchMapping("/{id}/advance")
-    @PreAuthorize("hasRole('PLANNER')")
-    public WorkOrderResponse advanceStatus(@PathVariable Long id) {
-        return workOrderService.advanceStatus(id);
+    @PreAuthorize("hasAnyRole('PLANNER', 'OPERATOR')")
+    public WorkOrderResponse advanceStatus(@PathVariable Long id, Authentication auth) {
+        return workOrderService.advanceStatus(id, auth);
     }
 
     @PatchMapping("/{id}/cancel")

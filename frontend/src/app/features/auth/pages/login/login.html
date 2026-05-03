@@ -1,0 +1,42 @@
+<div class="card">
+  <h1>PlanPlus</h1>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="username">Korisničko ime</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+      />
+      @if (form.controls.username.dirty && form.controls.username.hasError('required')) {
+        <span class="field-error">Korisničko ime je obavezno</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Lozinka</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+      />
+      @if (form.controls.password.dirty && form.controls.password.hasError('required')) {
+        <span class="field-error">Lozinka je obavezna</span>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
+
+    <button
+      type="submit"
+      [disabled]="loading() || form.invalid"
+    >
+      {{ loading() ? 'Prijavljivanje...' : 'Prijavi se' }}
+    </button>
+  </form>
+</div>

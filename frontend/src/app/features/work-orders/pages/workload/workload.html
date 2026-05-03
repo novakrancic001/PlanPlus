@@ -1,0 +1,43 @@
+<div class="page-header">
+  <h2>Opterećenost operatera</h2>
+</div>
+
+@if (isLoading) {
+  <p class="loading-text">Učitavanje...</p>
+} @else if (errorMessage) {
+  <div class="error-message">{{ errorMessage }}</div>
+} @else {
+  <div class="card">
+    <table class="workload-table">
+      <thead>
+        <tr>
+          <th>Ime</th>
+          <th>Prezime</th>
+          <th>Korisničko ime</th>
+          <th>Aktivni nalozi</th>
+          <th>Opterećenost</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (op of operators; track op.id) {
+          <tr>
+            <td>{{ op.firstName }}</td>
+            <td>{{ op.lastName }}</td>
+            <td>{{ op.username }}</td>
+            <td>{{ op.activeOrders }}</td>
+            <td>
+              <span class="status-badge" [class]="'status-badge status-' + op.loadStatus.toLowerCase()">
+                {{ statusLabel(op) }}
+              </span>
+            </td>
+          </tr>
+        }
+        @if (operators.length === 0) {
+          <tr>
+            <td colspan="5" class="empty">Nema registrovanih operatera.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

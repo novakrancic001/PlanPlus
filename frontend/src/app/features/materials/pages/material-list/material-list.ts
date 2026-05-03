@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { Material } from '../../../../core/models/material.model';
 import { MaterialService } from '../../material';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { PaginatorComponent } from '../../../../shared/components/paginator/paginator';
 import { Unit } from '../../../../core/models/product.model';
 
 @Component({
   selector: 'app-material-list',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ConfirmDialogComponent, PaginatorComponent],
   templateUrl: './material-list.html',
   styleUrl: './material-list.scss'
 })
@@ -19,15 +20,21 @@ export class MaterialListComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  // Create forma
+  currentPage = 0;
+  pageSize = 20;
+  totalElements = 0;
+  totalPages = 0;
+
+  searchQuery = '';
+  sortField: string | null = null;
+  sortDir: 'asc' | 'desc' = 'asc';
+
   materialForm: FormGroup;
 
-  // Inline edit
   editingId: number | null = null;
-  editName: string = '';
+  editName = '';
   editUnit: Unit = 'PCS';
 
-  // Delete dialog
   showDeleteDialog = false;
   materialToDelete: Material | null = null;
 
@@ -36,37 +43,77 @@ export class MaterialListComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.materialForm = this.fb.group({
-      sku: ['', Validators.required],
+      sku:  ['', Validators.required],
       name: ['', Validators.required],
       unit: ['PCS', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    this.loadMaterials();
+    this.load();
   }
 
-  loadMaterials(): void {
+  load(): void {
     this.isLoading = true;
-    this.materialService.getAll().subscribe({
-      next: (data: Material[]) => {
-        this.materials = data;
-        this.isLoading = false;
+    this.materialService.getAll({
+      page: this.currentPage,
+      size: this.pageSize,
+      sort: this.sortField ? `${this.sortField},${this.sortDir}` : undefined,
+      search: this.searchQuery || undefined
+    }).subscribe({
+      next: page => {
+        this.materials     = page.content;
+        this.totalElements = page.totalElements;
+        this.totalPages    = page.totalPages;
+        this.isLoading     = false;
       },
-      error: (err: any) => {
+      error: () => {
         this.errorMessage = 'Greška pri učitavanju materijala.';
-        this.isLoading = false;
-        console.error(err);
+        this.isLoading    = false;
       }
     });
   }
 
+  onSearch(): void {
+    this.currentPage = 0;
+    this.load();
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.load();
+  }
+
+  onSizeChange(size: number): void {
+    this.pageSize    = size;
+    this.currentPage = 0;
+    this.load();
+  }
+
+  setSort(field: string): void {
+    if (this.sortField === field) {
+      this.sortDir === 'asc' ? (this.sortDir = 'desc') : (this.sortField = null);
+    } else {
+      this.sortField = field;
+      this.sortDir   = 'asc';
+    }
+    this.currentPage = 0;
+    this.load();
+  }
+
+  sortIcon(field: string): string {
+    if (this.sortField !== field) return '↕';
+    return this.sortDir === 'asc' ? '↑' : '↓';
+  }
+
   onSubmit(): void {
     if (this.materialForm.invalid) return;
+    this.errorMessage = '';
     this.materialService.create(this.materialForm.value).subscribe({
       next: () => {
         this.materialForm.reset({ unit: 'PCS' });
-        this.loadMaterials();
+        this.currentPage = 0;
+        this.load();
       },
       error: (err: any) => {
         this.errorMessage = err.error?.error || 'Greška pri kreiranju materijala.';
@@ -74,35 +121,25 @@ export class MaterialListComponent implements OnInit {
     });
   }
 
-  // --- Edit ---
   startEdit(material: Material): void {
     this.editingId = material.id;
-    this.editName = material.name;
-    this.editUnit = material.unit;
+    this.editName  = material.name;
+    this.editUnit  = material.unit;
   }
 
-  cancelEdit(): void {
-    this.editingId = null;
-  }
+  cancelEdit(): void { this.editingId = null; }
 
   saveEdit(material: Material): void {
     const updated: Material = { ...material, name: this.editName, unit: this.editUnit };
     this.materialService.updateMaterial(material.id, updated).subscribe({
-      next: () => {
-        this.loadMaterials();
-        this.editingId = null;
-      },
-      error: (err: any) => {
-        this.errorMessage = 'Greška pri izmeni materijala.';
-        console.error(err);
-      }
+      next: () => { this.editingId = null; this.load(); },
+      error: () => { this.errorMessage = 'Greška pri izmeni materijala.'; }
     });
   }
 
-  // --- Delete ---
   openDeleteDialog(material: Material): void {
     this.materialToDelete = material;
-    this.errorMessage = '';
+    this.errorMessage     = '';
     this.showDeleteDialog = true;
   }
 
@@ -114,17 +151,12 @@ export class MaterialListComponent implements OnInit {
   confirmDelete(): void {
     if (!this.materialToDelete) return;
     this.materialService.deleteMaterial(this.materialToDelete.id).subscribe({
-      next: () => {
-        this.loadMaterials();
-        this.cancelDelete();
-      },
+      next: () => { this.cancelDelete(); this.load(); },
       error: (err: any) => {
         this.cancelDelete();
-        if (err.status === 409) {
-          this.errorMessage = 'Materijal se koristi u BOM stavkama i ne može biti obrisan.';
-        } else {
-          this.errorMessage = 'Greška pri brisanju materijala.';
-        }
+        this.errorMessage = err.status === 409
+          ? 'Materijal se koristi u BOM stavkama i ne može biti obrisan.'
+          : 'Greška pri brisanju materijala.';
       }
     });
   }

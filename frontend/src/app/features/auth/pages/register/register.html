@@ -1,0 +1,88 @@
+<div class="page-header">
+  <h2>Registracija korisnika</h2>
+</div>
+
+<div class="card">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="field">
+        <label for="firstName">Ime</label>
+        <input id="firstName" type="text" formControlName="firstName" />
+        @if (form.controls.firstName.dirty && form.controls.firstName.hasError('required')) {
+          <span class="field-error">Ime je obavezno</span>
+        }
+        @if (fieldErrors()['firstName']) {
+          <span class="field-error">{{ fieldErrors()['firstName'] }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="lastName">Prezime</label>
+        <input id="lastName" type="text" formControlName="lastName" />
+        @if (form.controls.lastName.dirty && form.controls.lastName.hasError('required')) {
+          <span class="field-error">Prezime je obavezno</span>
+        }
+        @if (fieldErrors()['lastName']) {
+          <span class="field-error">{{ fieldErrors()['lastName'] }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="username">Korisničko ime</label>
+      <input id="username" type="text" formControlName="username" autocomplete="off" />
+      @if (form.controls.username.dirty) {
+        @if (form.controls.username.hasError('required')) {
+          <span class="field-error">Korisničko ime je obavezno</span>
+        } @else if (form.controls.username.hasError('minlength')) {
+          <span class="field-error">Korisničko ime mora imati najmanje 3 karaktera</span>
+        }
+      }
+      @if (fieldErrors()['username']) {
+        <span class="field-error">{{ fieldErrors()['username'] }}</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Lozinka</label>
+      <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+      @if (form.controls.password.dirty) {
+        @if (form.controls.password.hasError('required')) {
+          <span class="field-error">Lozinka je obavezna</span>
+        } @else if (form.controls.password.hasError('minlength')) {
+          <span class="field-error">Lozinka mora imati najmanje 6 karaktera</span>
+        }
+      }
+      @if (fieldErrors()['password']) {
+        <span class="field-error">{{ fieldErrors()['password'] }}</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="role">Uloga</label>
+      <select id="role" formControlName="role">
+        <option value="">-- Izaberite ulogu --</option>
+        <option value="PLANNER">Planer</option>
+        <option value="OPERATOR">Operater</option>
+      </select>
+      @if (form.controls.role.dirty && form.controls.role.hasError('required')) {
+        <span class="field-error">Uloga je obavezna</span>
+      }
+      @if (fieldErrors()['role']) {
+        <span class="field-error">{{ fieldErrors()['role'] }}</span>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
+
+    @if (successMessage()) {
+      <div class="success-message">{{ successMessage() }}</div>
+    }
+
+    <button type="submit" [disabled]="loading() || form.invalid">
+      {{ loading() ? 'Registracija...' : 'Registruj korisnika' }}
+    </button>
+  </form>
+</div>

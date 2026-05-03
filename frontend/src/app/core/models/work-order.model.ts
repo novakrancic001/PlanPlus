@@ -1,11 +1,13 @@
-import { Product } from './product.model';
+import { User } from './user.model';
 
 export type OrderStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export interface WorkOrder {
   id: number;
-  product: Product;
+  productId: number;
+  productName: string;
   quantity: number;
   status: OrderStatus;
-  createdAt: string;  // Angular prima datum kao string, konvertujemo po potrebi
+  createdAt: string;
+  assignedTo?: User | null;
 }

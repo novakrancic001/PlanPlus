@@ -67,7 +67,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   loadMaterials(): void {
-    this.materialService.getAll().subscribe({
+    this.materialService.getAllForDropdown().subscribe({
       next: (data) => this.materials = data,
       error: (err) => console.error(err)
     });

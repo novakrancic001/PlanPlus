@@ -1,0 +1,33 @@
+<div class="paginator">
+  <span class="paginator-info">
+    @if (totalElements === 0) {
+      Nema rezultata
+    } @else {
+      {{ from }}–{{ to }} od {{ totalElements }}
+    }
+  </span>
+
+  <div class="paginator-controls">
+    <button class="page-btn" (click)="goTo(0)" [disabled]="page === 0" title="Prva strana">«</button>
+    <button class="page-btn" (click)="goTo(page - 1)" [disabled]="page === 0" title="Prethodna">‹</button>
+
+    @for (p of pageNumbers; track p) {
+      <button
+        class="page-btn"
+        [class.active]="p === page"
+        (click)="goTo(p)"
+      >{{ p + 1 }}</button>
+    }
+
+    <button class="page-btn" (click)="goTo(page + 1)" [disabled]="page >= totalPages - 1" title="Sledeća">›</button>
+    <button class="page-btn" (click)="goTo(totalPages - 1)" [disabled]="page >= totalPages - 1" title="Poslednja">»</button>
+  </div>
+
+  <div class="paginator-size">
+    <select [value]="size" (change)="onSizeChange($event)">
+      @for (s of pageSizes; track s) {
+        <option [value]="s" [selected]="s === size">{{ s }} po strani</option>
+      }
+    </select>
+  </div>
+</div>

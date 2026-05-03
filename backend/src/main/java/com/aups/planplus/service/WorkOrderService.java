@@ -129,15 +129,28 @@ public class WorkOrderService {
     }
 
     @Transactional
-    public WorkOrderResponse advanceStatus(Long id) {
+    public WorkOrderResponse advanceStatus(Long id, Authentication auth) {
         WorkOrder order = workOrderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Radni nalog nije pronađen!"));
 
-        switch (order.getStatus()) {
-            case PLANNED     -> order.setStatus(WorkOrder.OrderStatus.IN_PROGRESS);
-            case IN_PROGRESS -> order.setStatus(WorkOrder.OrderStatus.COMPLETED);
-            default          -> throw new RuntimeException(
-                    "Nije moguće napredovati nalog sa statusom: " + order.getStatus());
+        User currentUser = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen!"));
+
+        if (currentUser.getRole() == Role.OPERATOR) {
+            if (order.getStatus() != WorkOrder.OrderStatus.IN_PROGRESS) {
+                throw new IllegalArgumentException("Operater može završiti samo nalog koji je u toku.");
+            }
+            if (order.getAssignedTo() == null || !order.getAssignedTo().getId().equals(currentUser.getId())) {
+                throw new AccessDeniedException("Možete završiti samo nalog koji vam je dodeljen.");
+            }
+            order.setStatus(WorkOrder.OrderStatus.COMPLETED);
+        } else {
+            switch (order.getStatus()) {
+                case PLANNED     -> order.setStatus(WorkOrder.OrderStatus.IN_PROGRESS);
+                case IN_PROGRESS -> order.setStatus(WorkOrder.OrderStatus.COMPLETED);
+                default          -> throw new RuntimeException(
+                        "Nije moguće napredovati nalog sa statusom: " + order.getStatus());
+            }
         }
 
         return WorkOrderResponse.from(workOrderRepository.save(order));
